@@ -149,15 +149,18 @@ class ComponentConfigurationBuilder<T> {
   }
 
   private ConfigurableAttributeDefinitionVisitor setterVisitor(String propertyName, AttributeDefinition attributeDefinition) {
-    DefaultValueVisitor defaultValueVisitor = new DefaultValueVisitor();
-    attributeDefinition.accept(defaultValueVisitor);
-    Optional<Object> defaultValue = defaultValueVisitor.getDefaultValue();
     return new ConfigurableAttributeDefinitionVisitor(value -> {
-      if (isPropertySetWithUserConfigValue(propertyName, defaultValue, value)) {
+      if (isPropertySetWithUserConfigValue(propertyName, getDefaultValue(attributeDefinition), value)) {
         return;
       }
       beanDefinitionBuilderHelper.forProperty(propertyName).addValue(value);
     });
+  }
+
+  private Optional<Object> getDefaultValue(AttributeDefinition attributeDefinition) {
+    DefaultValueVisitor defaultValueVisitor = new DefaultValueVisitor();
+    attributeDefinition.accept(defaultValueVisitor);
+    return defaultValueVisitor.getDefaultValue();
   }
 
   private boolean isPropertySetWithUserConfigValue(String propertyName, Optional<Object> defaultValue, Object value) {

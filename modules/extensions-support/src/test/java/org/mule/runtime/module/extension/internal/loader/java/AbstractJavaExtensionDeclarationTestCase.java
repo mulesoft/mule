@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;

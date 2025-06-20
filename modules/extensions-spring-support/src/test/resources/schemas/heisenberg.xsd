@@ -3344,6 +3344,66 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ManyRoutesRouterType" substitutionGroup="mule:abstract-operator" name="many-routes-router"></xs:element>
+  <xs:complexType name="ManyRoutesRouterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="whens">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="when">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:extension base="mule:abstractExtensionType">
+                            <xs:sequence minOccurs="1">
+                              <xs:choice minOccurs="1" maxOccurs="unbounded">
+                                <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                              </xs:choice>
+                            </xs:sequence>
+                            <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
+                            <xs:attribute type="mule:expressionString" use="required" name="message"></xs:attribute>
+                          </xs:extension>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="other">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence minOccurs="1">
+                    <xs:choice minOccurs="1" maxOccurs="unbounded">
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                    </xs:choice>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="processorName"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NeverFailsWrapperType" substitutionGroup="mule:abstract-operator" name="never-fails-wrapper"></xs:element>
   <xs:complexType name="NeverFailsWrapperType">
     <xs:complexContent>

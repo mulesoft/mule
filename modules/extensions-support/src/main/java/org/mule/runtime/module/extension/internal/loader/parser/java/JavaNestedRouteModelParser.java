@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.route.JavaChainParsingUtils.parseChainExecutionOccurrence;
-
-import static java.util.Optional.empty;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -20,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -44,17 +46,30 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   private final ExtensionParameter route;
   private final ExtensionLoadingContext loadingContext;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
+  private final boolean listOfRoutes;
   private final boolean sdkApiDefined;
 
   public JavaNestedRouteModelParser(ExtensionParameter route, ExtensionLoadingContext loadingContext) {
     this.route = route;
     this.loadingContext = loadingContext;
 
-    Class clazz = route.getType().getDeclaringClass().orElse(null);
+    Class<?> clazz = route.getType().getDeclaringClass().orElse(null);
+
     if (clazz != null) {
-      additionalModelProperties.add(new ImplementingTypeModelProperty(clazz));
-      sdkApiDefined = Route.class.isAssignableFrom(clazz);
+      if (clazz.isAssignableFrom(List.class)) {
+        listOfRoutes = true;
+        Class<?> routeClazz = route.getType().getGenerics().get(0).getConcreteType()
+            .getDeclaringClass().orElse(null);
+
+        additionalModelProperties.add(new ImplementingTypeModelProperty(routeClazz));
+        sdkApiDefined = Route.class.isAssignableFrom(routeClazz);
+      } else {
+        listOfRoutes = false;
+        additionalModelProperties.add(new ImplementingTypeModelProperty(clazz));
+        sdkApiDefined = Route.class.isAssignableFrom(clazz);
+      }
     } else {
+      listOfRoutes = false;
       sdkApiDefined = false;
     }
   }
@@ -71,19 +86,29 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   @Override
   public int getMinOccurs() {
+    if (listOfRoutes) {
+      return 0;
+    }
+
     return route.isRequired() ? 1 : 0;
   }
 
   @Override
   public Optional<Integer> getMaxOccurs() {
-    return empty();
+    return listOfRoutes ? empty() : of(1);
   }
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    final List<FieldElement> parameters = route.getType().getAnnotatedFields(
-                                                                             Parameter.class,
-                                                                             org.mule.sdk.api.annotation.param.Parameter.class);
+    Type routeType;
+    if (listOfRoutes) {
+      routeType = route.getType().getGenerics().get(0).getConcreteType();
+    } else {
+      routeType = route.getType();
+    }
+
+    final List<FieldElement> parameters = routeType.getAnnotatedFields(Parameter.class,
+                                                                       org.mule.sdk.api.annotation.param.Parameter.class);
 
     return getParameterGroupParsers(parameters, forRoute(getName(), loadingContext));
   }
