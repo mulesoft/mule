@@ -3,7 +3,7 @@ upstreamProjects:
   Mule-runtime/mule-profiling-api/support/1.5.x,
   Mule-runtime/mule-api/1.9.7-DRY-RUN,
   Mule-runtime/mule-extensions-api/support/1.9.x,
-  Mule-runtime/mule-artifact-ast/support/1.5.x,
+  Mule-runtime/mule-artifact-ast/1.5.7-DRY-RUN,
   Mule-runtime/mule-properties-api/1.5.7-DRY-RUN,
   DataWeave/data-weave/support/4.9.x,
   Mule-runtime/mule-maven-client/support/2.4.x
