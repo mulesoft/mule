@@ -1008,6 +1008,12 @@ public interface AllureConstants {
 
     }
 
+    interface Components {
+
+      String SDK_ROUTERS_LIST_OF_ROUTES = "SDK routers with list of routes";
+
+    }
+
     interface SupportedJavaVersions {
 
       String JAVA_VERSIONS_IN_EXTENSION_MODEL = "Supported Java Versions are reflected in the ExtensionModel";
