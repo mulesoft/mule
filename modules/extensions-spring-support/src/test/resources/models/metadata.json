@@ -38331,6 +38331,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -38365,6 +38366,7 @@
         },
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -38821,6 +38823,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -39267,6 +39270,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -39742,6 +39746,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -39776,6 +39781,7 @@
         },
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -40237,6 +40243,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
