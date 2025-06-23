@@ -31,8 +31,8 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import java.util.Optional;
 
 /**
- * A parser which returns the definition parsers for a given {@link NestedRouteModel} with
- * {@link NestedRouteModel#getMaxOccurs()} is empty or greater than 1
+ * A parser which returns the definition parsers for a given {@link NestedRouteModel} with {@link NestedRouteModel#getMaxOccurs()}
+ * is empty or greater than 1
  *
  * @since 4.10
  */

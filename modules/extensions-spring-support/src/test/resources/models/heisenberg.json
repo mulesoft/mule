@@ -34920,6 +34920,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -46668,9 +46669,7 @@
           ],
           "name": "whens",
           "description": "",
-          "modelProperties": {
-            "org.mule.runtime.extension.api.property.ListOfRoutesModelProperty": {}
-          },
+          "modelProperties": {},
           "childComponents": [
             {
               "executionOccurrence": "ONCE_OR_NONE",
@@ -46698,6 +46697,7 @@
         },
         {
           "minOccurs": 0,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -52437,6 +52437,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -52771,6 +52772,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -53191,6 +53193,7 @@
       "nestedComponents": [
         {
           "minOccurs": 0,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -53225,6 +53228,7 @@
         },
         {
           "minOccurs": 0,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -53662,6 +53666,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -53763,6 +53768,7 @@
         },
         {
           "minOccurs": 0,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -55760,6 +55766,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -55853,6 +55860,7 @@
         },
         {
           "minOccurs": 0,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",
@@ -57399,6 +57407,7 @@
       "nestedComponents": [
         {
           "minOccurs": 1,
+          "maxOccurs": 1,
           "errors": [],
           "semanticTerms": [],
           "visibility": "PUBLIC",

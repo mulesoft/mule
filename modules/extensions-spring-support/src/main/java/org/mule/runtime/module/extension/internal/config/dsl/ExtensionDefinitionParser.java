@@ -31,6 +31,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsMultiple;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.acceptsReferences;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.getChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
@@ -85,7 +86,6 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
-import org.mule.runtime.extension.api.property.ListOfRoutesModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.ListOfRoutesComponentParser;
@@ -881,7 +881,7 @@ public abstract class ExtensionDefinitionParser {
     final var tccl = getContextClassLoader();
     final var parserTypeLoader = of(typeLoader);
     try {
-      if (routeModel.getModelProperty(ListOfRoutesModelProperty.class).isPresent()) {
+      if (supportsMultiple(routeModel)) {
         new ListOfRoutesComponentParser(definitionBuilder, routeModel, metadataType, tccl, routeDsl,
                                         dslResolver, parsingContext, parserTypeLoader)
                                             .parse()
