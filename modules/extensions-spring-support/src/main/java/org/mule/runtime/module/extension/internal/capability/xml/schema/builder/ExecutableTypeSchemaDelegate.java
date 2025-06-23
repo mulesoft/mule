@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
@@ -20,15 +18,21 @@ import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConsta
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.UNBOUNDED;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ComponentModelVisitor;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
-import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -114,10 +118,12 @@ abstract class ExecutableTypeSchemaDelegate {
 
   protected ExtensionType registerNestedComponents(ExtensionType type, List<? extends NestableElementModel> nestedComponents) {
     initialiseSequence(type);
-    nestedComponents.forEach(component -> component.accept(new NestableElementModelVisitor() {
+    nestedComponents.forEach(component -> component.accept(new ComponentModelVisitor() {
 
       @Override
-      public void visit(NestedComponentModel component) {}
+      public void visit(NestedComponentModel component) {
+        // nothing to do
+      }
 
       @Override
       public void visit(NestedChainModel component) {
@@ -127,6 +133,21 @@ abstract class ExecutableTypeSchemaDelegate {
       @Override
       public void visit(NestedRouteModel component) {
         generateNestedRouteElement(type, dsl.resolve(component), component);
+      }
+
+      @Override
+      public void visit(OperationModel model) {
+        // nothing to do
+      }
+
+      @Override
+      public void visit(SourceModel model) {
+        // nothing to do
+      }
+
+      @Override
+      public void visit(ConstructModel model) {
+        // nothing to do
       }
     }));
 
@@ -161,7 +182,8 @@ abstract class ExecutableTypeSchemaDelegate {
 
     registerParameters(complexType.getComplexContent().getExtension(), routeModel.getAllParameterModels());
     TopLevelElement routeElement = builder.createTopLevelElement(routeDsl.getElementName(),
-                                                                 BigInteger.valueOf(routeModel.getMinOccurs()), MAX_ONE);
+                                                                 BigInteger.valueOf(routeModel.getMinOccurs()),
+                                                                 MAX_ONE);
     routeElement.setComplexType(complexType);
 
     type.getSequence().getParticle().add(objectFactory.createElement(routeElement));

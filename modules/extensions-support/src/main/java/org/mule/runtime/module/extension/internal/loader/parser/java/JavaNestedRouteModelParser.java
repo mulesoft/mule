@@ -10,7 +10,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.route.JavaChainParsingUtils.parseChainExecutionOccurrence;
 
-import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -76,7 +76,7 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   @Override
   public Optional<Integer> getMaxOccurs() {
-    return empty();
+    return of(1);
   }
 
   @Override

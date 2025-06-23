@@ -42,15 +42,15 @@ import jakarta.inject.Inject;
  *
  * @since 4.0
  */
-public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<Object> {
+public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<RouteBuilderValueResolver> {
 
   private final NestedRouteModel model;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
   private final List<Processor> nestedProcessors;
   private final RunOnce initialiser;
-  private DefaultObjectBuilder builder;
-  private Class<Object> objectClass;
+  private DefaultObjectBuilder<RouteBuilderValueResolver> builder;
+  private Class<RouteBuilderValueResolver> objectClass;
   @Inject
   private ReflectionCache reflectionCache;
 
@@ -63,12 +63,12 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
     this.nestedProcessors = nestedProcessors;
     initialiser = of(() -> {
       objectClass = getType(objectType);
-      builder = new DefaultObjectBuilder(objectClass, reflectionCache);
+      builder = new DefaultObjectBuilder<>(objectClass, reflectionCache);
     });
   }
 
   @Override
-  public Object doGetObject() throws Exception {
+  public RouteBuilderValueResolver doGetObject() throws Exception {
 
     return withContextClassLoader(classLoader, () -> {
       initialiser.runOnce();
@@ -97,4 +97,5 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
       throw exception;
     });
   }
+
 }
