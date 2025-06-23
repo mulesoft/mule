@@ -25,6 +25,8 @@ module org.mule.runtime.troubleshooting {
   requires org.mule.runtime.launcher;
   requires org.mule.runtime.manifest;
 
+  requires java.management;
+  requires jdk.management;
   requires org.apache.commons.lang3;
   requires org.json;
   requires com.google.gson;

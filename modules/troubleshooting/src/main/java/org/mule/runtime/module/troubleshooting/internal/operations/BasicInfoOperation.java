@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.troubleshooting.internal.operations;
 
+import static java.lang.Math.log;
+import static java.lang.Math.pow;
+import static java.lang.management.ManagementFactory.getOperatingSystemMXBean;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
@@ -26,6 +29,7 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallb
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOperationDefinition;
 
+import java.lang.management.OperatingSystemMXBean;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -105,11 +109,78 @@ public class BasicInfoOperation implements TroubleshootingOperation {
       writer.write("Report Generation:" + lineSeparator());
       writer.write("  Report Millis Time: %d".formatted(System.currentTimeMillis()) + lineSeparator());
       writer.write("  Report Nano Time: %d".formatted(System.nanoTime()) + lineSeparator());
+
+      writer.write(lineSeparator());
+      writer.write("System Resources:" + lineSeparator());
+
+      // Memory information
+      Runtime runtime = Runtime.getRuntime();
+      long totalMemory = runtime.totalMemory();
+      long freeMemory = runtime.freeMemory();
+      long usedMemory = totalMemory - freeMemory;
+      long maxMemory = runtime.maxMemory();
+
+      writer.write("  memory.used=%s".formatted(formatBytes(usedMemory)) + lineSeparator());
+      writer.write("  memory.free=%s".formatted(formatBytes(freeMemory)) + lineSeparator());
+      writer.write("  memory.total=%s".formatted(formatBytes(totalMemory)) + lineSeparator());
+      writer.write("  memory.max=%s".formatted(formatBytes(maxMemory)) + lineSeparator());
+      writer.write("  memory.used/total=%.2f%%".formatted((double) usedMemory / totalMemory * 100) + lineSeparator());
+      writer.write("  memory.used/max=%.2f%%".formatted((double) usedMemory / maxMemory * 100) + lineSeparator());
+
+      // CPU information
+      writer.write("  load.process=%.2f%%".formatted(getProcessCpuLoad()) + lineSeparator());
+      writer.write("  load.system=%.2f%%".formatted(getSystemCpuLoad()) + lineSeparator());
+      writer.write("  load.systemAverage=%.2f%%".formatted(getSystemLoadAverage()) + lineSeparator());
     };
   }
 
   private static TroubleshootingOperationDefinition createOperationDefinition() {
     return new DefaultTroubleshootingOperationDefinition(BASIC_INFO_OPERATION_NAME, BASIC_INFO_OPERATION_DESCRIPTION);
+  }
+
+  private static String formatBytes(long bytes) {
+    if (bytes < 1024)
+      return bytes + "B";
+    int exp = (int) (log(bytes) / log(1024));
+    String pre = "KMGTPE".charAt(exp - 1) + "";
+    return String.format("%.1f%s", bytes / pow(1024, exp), pre);
+  }
+
+  private static double getProcessCpuLoad() {
+    try {
+      OperatingSystemMXBean osBean = getOperatingSystemMXBean();
+      if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
+        return ((com.sun.management.OperatingSystemMXBean) osBean).getProcessCpuLoad() * 100;
+      }
+    } catch (Exception e) {
+      // Fallback if not available
+    }
+    return -1.0;
+  }
+
+  private static double getSystemCpuLoad() {
+    try {
+      OperatingSystemMXBean osBean = getOperatingSystemMXBean();
+      if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
+        return ((com.sun.management.OperatingSystemMXBean) osBean).getSystemCpuLoad() * 100;
+      }
+    } catch (Exception e) {
+      // Fallback if not available
+    }
+    return -1.0;
+  }
+
+  private static double getSystemLoadAverage() {
+    try {
+      OperatingSystemMXBean osBean = getOperatingSystemMXBean();
+      double loadAverage = osBean.getSystemLoadAverage();
+      if (loadAverage >= 0) {
+        return loadAverage * 100;
+      }
+    } catch (Exception e) {
+      // Fallback if not available
+    }
+    return -1.0;
   }
 
 }
