@@ -84,13 +84,13 @@ public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends Abs
     final String testValue = "test value";
     builder.setArtifactProperties(singletonMap(testKey, testValue));
 
+    var session = (AbstractArtifactAgnosticService) builder.build();
     try {
-      ((AbstractArtifactAgnosticService) builder.build()).getStartedApplication();
+      session.getStartedApplication();
     } catch (Throwable t) {
       // Not interested in this succeeding, just interested in the descriptor being created
     }
 
-    assertThat(applicationDescriptor.get().getArtifactDeclaration(), is(artifactDeclaration));
     assertThat(applicationDescriptor.get().getAppProperties(), aMapWithSize(1));
     assertThat(applicationDescriptor.get().getAppProperties(), hasEntry(is(testKey), is(testValue)));
   }

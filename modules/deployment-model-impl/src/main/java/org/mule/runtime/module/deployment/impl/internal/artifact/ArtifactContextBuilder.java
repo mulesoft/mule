@@ -39,7 +39,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -107,7 +106,6 @@ public class ArtifactContextBuilder {
   private ArtifactType artifactType = APP;
   private ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private String[] configurationFiles = new String[0];
-  private ArtifactDeclaration artifactDeclaration;
   private Map<String, String> artifactProperties = new HashMap<>();
   private String artifactName = getUUID();
   private MuleContextBuilder muleContextBuilder;
@@ -203,15 +201,6 @@ public class ArtifactContextBuilder {
    */
   public ArtifactContextBuilder setConfigurationFiles(String... configurationFiles) {
     this.configurationFiles = configurationFiles;
-    return this;
-  }
-
-  /**
-   * @param artifactDeclaration Artifact declaration.
-   * @return
-   */
-  public ArtifactContextBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
-    this.artifactDeclaration = artifactDeclaration;
     return this;
   }
 
@@ -483,7 +472,6 @@ public class ArtifactContextBuilder {
                 ArtifactContextConfiguration.builder()
                     .setMuleContext(muleContext)
                     .setConfigResources(configurationFiles)
-                    .setArtifactDeclaration(artifactDeclaration)
                     .setArtifactProperties(merge(artifactProperties, muleContext.getDeploymentProperties()))
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)

@@ -10,7 +10,6 @@ import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +32,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   private String encoding;
   private Map<String, String> appProperties = new HashMap<>();
-  private ArtifactDeclaration artifactDeclaration;
   private volatile Optional<BundleDescriptor> domainDescriptor;
   private String domainName;
 
@@ -92,20 +90,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public void setDomainName(String domainName) {
     this.domainName = domainName;
-  }
-
-  /**
-   * @return programmatic definition of the application configuration.
-   */
-  public ArtifactDeclaration getArtifactDeclaration() {
-    return artifactDeclaration;
-  }
-
-  /**
-   * @param artifactDeclaration programmatic definition of the application configuration.
-   */
-  public void setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
-    this.artifactDeclaration = artifactDeclaration;
   }
 
   @Override

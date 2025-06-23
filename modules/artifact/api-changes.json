@@ -6,6 +6,18 @@
           {
             "ignore": true,
             "code": "java.method.removed",
+            "old": "method org.mule.runtime.app.declaration.api.ArtifactDeclaration org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor::getArtifactDeclaration()",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor::setArtifactDeclaration(org.mule.runtime.app.declaration.api.ArtifactDeclaration)",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
             "old": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
             "justification": "W-17454020: Remove DeserializationPostInitialisable"
           },

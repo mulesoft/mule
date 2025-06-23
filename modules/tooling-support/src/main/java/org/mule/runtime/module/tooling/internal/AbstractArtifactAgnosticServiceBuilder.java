@@ -82,6 +82,10 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
     return getThis();
   }
 
+  protected ArtifactDeclaration getArtifactDeclaration() {
+    return artifactDeclaration;
+  }
+
   @Override
   public T setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
     checkState(artifactDeclaration != null, "artifactDeclaration cannot be null");
@@ -190,7 +194,6 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       ApplicationDescriptor artifactDescriptor =
           defaultApplicationFactory.createArtifactDescriptor(applicationFolder, of(deploymentProperties));
       artifactDescriptor.setMinMuleVersion(muleVersion);
-      artifactDescriptor.setArtifactDeclaration(artifactDeclaration);
       artifactDescriptor.setAppProperties(artifactProperties);
       return defaultApplicationFactory.createArtifact(artifactDescriptor);
     });

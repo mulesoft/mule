@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal.processor;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
-import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
@@ -19,7 +18,6 @@ import static java.util.Collections.emptySet;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
@@ -52,7 +50,6 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
   protected ArtifactAst obtainArtifactAst(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException {
     return createApplicationModel(artifactContextConfiguration.getMuleContext(),
-                                  artifactContextConfiguration.getArtifactDeclaration(),
                                   artifactContextConfiguration.getConfigResources(),
                                   artifactContextConfiguration.getArtifactProperties(),
                                   artifactContextConfiguration.getArtifactType(),
@@ -68,7 +65,6 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
   }
 
   private ArtifactAst createApplicationModel(MuleContext muleContext,
-                                             ArtifactDeclaration artifactDeclaration,
                                              String[] artifactConfigResources,
                                              Map<String, String> artifactProperties,
                                              ArtifactType artifactType,
@@ -82,25 +78,21 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
     try {
       final ArtifactAst artifactAst;
 
-      if (artifactDeclaration == null) {
-        if (artifactConfigResources.length == 0) {
-          artifactAst = emptyArtifact();
-        } else {
-          artifactAst = parseAndBuildAppExtensionModel(muleContext.getConfiguration().getId(),
-                                                       artifactConfigResources,
-                                                       (exts, disableValidations) -> createMuleXmlParser(muleContext, exts,
-                                                                                                         artifactProperties,
-                                                                                                         artifactType,
-                                                                                                         parentArtifactAst,
-                                                                                                         disableValidations),
-                                                       extensions,
-                                                       disableXmlValidations,
-                                                       muleContext.getExecutionClassLoader(),
-                                                       muleContext.getConfiguration(),
-                                                       expressionLanguageMetadataService);
-        }
+      if (artifactConfigResources.length == 0) {
+        artifactAst = emptyArtifact();
       } else {
-        artifactAst = toArtifactast(artifactDeclaration, extensions);
+        artifactAst = parseAndBuildAppExtensionModel(muleContext.getConfiguration().getId(),
+                                                     artifactConfigResources,
+                                                     (exts, disableValidations) -> createMuleXmlParser(muleContext, exts,
+                                                                                                       artifactProperties,
+                                                                                                       artifactType,
+                                                                                                       parentArtifactAst,
+                                                                                                       disableValidations),
+                                                     extensions,
+                                                     disableXmlValidations,
+                                                     muleContext.getExecutionClassLoader(),
+                                                     muleContext.getConfiguration(),
+                                                     expressionLanguageMetadataService);
       }
 
       return artifactAst;

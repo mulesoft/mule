@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
-import static com.google.common.base.Throwables.propagateIfPossible;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+
+import static com.google.common.base.Throwables.propagateIfPossible;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.sampledata.SampleDataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.ValueResult;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
@@ -39,11 +42,11 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDeclarationSession.class);
   private LazyValue<DeclarationSession> internalDeclarationSession;
 
-  DefaultDeclarationSession(ApplicationSupplier applicationSupplier) {
+  DefaultDeclarationSession(ApplicationSupplier applicationSupplier, ArtifactDeclaration artifactDeclaration) {
     super(applicationSupplier);
     this.internalDeclarationSession = new LazyValue<>(() -> {
       try {
-        return createInternalService(getStartedApplication());
+        return createInternalService(getStartedApplication(), artifactDeclaration);
       } catch (ApplicationStartingException e) {
         Exception causeException = e.getCauseException();
         LOGGER.error("There was an error while starting temporary application for declaration session: {}",
@@ -54,14 +57,14 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
     });
   }
 
-  private DeclarationSession createInternalService(Application application) {
+  private DeclarationSession createInternalService(Application application, ArtifactDeclaration artifactDeclaration) {
     long startTime = currentTimeMillis();
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Creating declaration session to delegate calls");
     }
 
     final InternalDeclarationSession internalDeclarationService =
-        new InternalDeclarationSession(application.getDescriptor().getArtifactDeclaration());
+        new InternalDeclarationSession(artifactDeclaration);
     final MuleContext muleContext = application.getArtifactContext().getMuleContext();
     if (muleContext == null) {
       throw new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession"));

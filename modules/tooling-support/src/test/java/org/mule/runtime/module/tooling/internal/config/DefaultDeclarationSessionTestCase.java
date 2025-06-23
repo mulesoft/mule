@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+
 import static java.lang.Boolean.TRUE;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.junit.rules.ExpectedException.none;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -71,7 +74,7 @@ public class DefaultDeclarationSessionTestCase extends AbstractMuleTestCase {
   public void deploymentException() throws Exception {
     when(applicationSupplier.get()).thenThrow(new DeploymentException(createStaticMessage(EXPECTED_EXCEPTION)));
 
-    DefaultDeclarationSession defaultDeclarationSession = new DefaultDeclarationSession(applicationSupplier);
+    DefaultDeclarationSession defaultDeclarationSession = new DefaultDeclarationSession(applicationSupplier, null);
 
     expectedException.expect(DeploymentException.class);
     expectedException.expectMessage(EXPECTED_EXCEPTION);
@@ -83,7 +86,7 @@ public class DefaultDeclarationSessionTestCase extends AbstractMuleTestCase {
     when(applicationSupplier.get()).thenReturn(application);
     doThrow(new DeploymentInitException(createStaticMessage(EXPECTED_EXCEPTION))).when(application).start();
 
-    DefaultDeclarationSession defaultDeclarationSession = new DefaultDeclarationSession(applicationSupplier);
+    DefaultDeclarationSession defaultDeclarationSession = new DefaultDeclarationSession(applicationSupplier, null);
 
     expectedException.expect(DeploymentInitException.class);
     expectedException.expectMessage(EXPECTED_EXCEPTION);
@@ -96,7 +99,7 @@ public class DefaultDeclarationSessionTestCase extends AbstractMuleTestCase {
     when(applicationSupplier.get()).thenReturn(application);
     doThrow(new DeploymentStartException(createStaticMessage(EXPECTED_EXCEPTION))).when(application).start();
 
-    DefaultDeclarationSession defaultDeclarationSession = new DefaultDeclarationSession(applicationSupplier);
+    DefaultDeclarationSession defaultDeclarationSession = new DefaultDeclarationSession(applicationSupplier, null);
 
     expectedException.expect(DeploymentStartException.class);
     expectedException.expectMessage(EXPECTED_EXCEPTION);

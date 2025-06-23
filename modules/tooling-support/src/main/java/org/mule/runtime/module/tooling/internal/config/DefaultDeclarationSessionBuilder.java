@@ -63,7 +63,7 @@ public class DefaultDeclarationSessionBuilder
 
   @Override
   protected DeclarationSession createService(ApplicationSupplier applicationSupplier) {
-    return new DefaultDeclarationSession(applicationSupplier);
+    return new DefaultDeclarationSession(applicationSupplier, getArtifactDeclaration());
   }
 
 }

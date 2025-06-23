@@ -275,7 +275,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
-              .setArtifactDeclaration(descriptor.getArtifactDeclaration())
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)

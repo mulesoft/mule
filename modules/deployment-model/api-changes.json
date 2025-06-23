@@ -1,4 +1,24 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder::setArtifactDeclaration(org.mule.runtime.app.declaration.api.ArtifactDeclaration)",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.app.declaration.api.ArtifactDeclaration org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration::getArtifactDeclaration()",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          }
+        ]
+      }
+    }
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [
