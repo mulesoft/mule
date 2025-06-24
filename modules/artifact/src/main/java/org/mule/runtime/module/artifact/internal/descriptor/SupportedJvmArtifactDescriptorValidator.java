@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.internal.descriptor;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 
 import static java.lang.String.format;
@@ -14,9 +13,9 @@ import static java.lang.System.getProperty;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_SPECIFICATION_VERSION;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
@@ -75,7 +74,7 @@ public class SupportedJvmArtifactDescriptorValidator implements ArtifactDescript
       String errorMessage = getErrorMessageFor(descriptor, runningJdkVersion, supportedJavaVersions);
 
       if (JVM_ENFORCEMENT_STRICT.equals(enforcementMode)) {
-        throw new MuleRuntimeException(createStaticMessage(errorMessage));
+        throw new ArtifactDescriptorCreateException(errorMessage);
       } else if (JVM_ENFORCEMENT_LOOSE.equals(enforcementMode)) {
         LOGGER.warn(errorMessage);
       } else if (JVM_ENFORCEMENT_DISABLED.equals(enforcementMode)) {
