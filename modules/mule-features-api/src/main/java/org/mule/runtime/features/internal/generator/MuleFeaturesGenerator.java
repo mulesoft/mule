@@ -99,6 +99,10 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
     appendLine(outputStream);
 
     appendLine(outputStream,
+               "\tpublic String getName() {" +
+                   "\treturn name();" +
+                   "\t} ");
+    appendLine(outputStream,
                "\tpublic String getDescription() {" +
                    "\treturn description;" +
                    "\t} ");

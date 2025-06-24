@@ -91,14 +91,14 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
 
   @Override
   public Feature getRuntimeTogglzFeature(org.mule.runtime.api.config.Feature feature) {
-    return runtimeFeaturesCache.get(feature.toString(), ft -> {
+    return runtimeFeaturesCache.get(feature.getName(), ft -> {
       throw new IllegalArgumentException(format(RUNTIME_FEATURE_NOT_REGISTERED, feature));
     });
   }
 
   @Override
   public MuleTogglzRuntimeFeature getOrRegisterRuntimeTogglzFeatureFrom(org.mule.runtime.api.config.Feature feature) {
-    return runtimeFeaturesCache.get(feature.toString(), key -> newRuntimeTogglzFeature(feature));
+    return runtimeFeaturesCache.get(feature.getName(), key -> newRuntimeTogglzFeature(feature));
   }
 
   private MuleTogglzRuntimeFeature newRuntimeTogglzFeature(org.mule.runtime.api.config.Feature ft) {

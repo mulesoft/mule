@@ -65,11 +65,12 @@ public class FeatureFlaggingUtils {
    * @see FeatureFlaggingRegistry
    */
   private static FeatureFlaggingService buildFeatureFlaggingService(ArtifactDescriptor artifactDescriptor) {
-    Map<Feature, Boolean> features = new HashMap<>();
+    Map<String, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags for artifact [{}]", artifactDescriptor.getName());
     FeatureContext featureContext = new FeatureContext(artifactDescriptor.getMinMuleVersion(), artifactDescriptor.getName());
     FeatureFlaggingRegistry.getInstance().getFeatureFlagConfigurations()
-        .forEach((feature, featureContextPredicate) -> features.put(feature, evaluateFeatureFlag(feature, featureContext)));
+        .forEach((feature, featureContextPredicate) -> features.put(feature.getName(),
+                                                                    evaluateFeatureFlag(feature, featureContext)));
     return new DeploymentFeatureFlaggingService(features);
   }
 
@@ -100,18 +101,18 @@ public class FeatureFlaggingUtils {
    */
   private static class DeploymentFeatureFlaggingService implements FeatureFlaggingService {
 
-    private final Map<Feature, Boolean> featureFlags;
+    private final Map<String, Boolean> featureFlags;
 
-    public DeploymentFeatureFlaggingService(Map<Feature, Boolean> featureFlags) {
+    public DeploymentFeatureFlaggingService(Map<String, Boolean> featureFlags) {
       this.featureFlags = featureFlags;
     }
 
     @Override
     public boolean isEnabled(Feature feature) {
-      if (!featureFlags.containsKey(feature)) {
+      if (!featureFlags.containsKey(feature.getName())) {
         throw new MuleRuntimeException(createStaticMessage("Feature %s not registered", feature));
       }
-      return featureFlags.get(feature);
+      return featureFlags.get(feature.getName());
     }
   }
 }
