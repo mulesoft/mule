@@ -69,7 +69,7 @@ public class HeisenbergOperationLifecycleValidator implements Initialisable, Sta
   private void checkState(String expected) throws InitialisationException {
     if (!state.equals(expected)) {
       throw new InitialisationException(
-                                        createStaticMessage("Invalid state: expected %s but as %s", expected, state), this);
+                                        createStaticMessage("Invalid state: expected %s but was %s", expected, state), this);
     }
   }
 }

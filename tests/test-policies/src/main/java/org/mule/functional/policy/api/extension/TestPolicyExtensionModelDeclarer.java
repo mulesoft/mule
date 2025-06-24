@@ -68,6 +68,7 @@ class TestPolicyExtensionModelDeclarer {
     proxyDeclarer
         .withRoute("source")
         .withMinOccurs(0)
+        .withMaxOccurs(1)
         .withModelProperty(new CustomLocationPartModelProperty("source", false))
         .withChain();
 
