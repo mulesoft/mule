@@ -122,7 +122,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hamcrest.Matcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -137,7 +137,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   private final ExtensionModel veganExtension = loadExtension(VeganExtension.class);
 
   @Test
-  public void flyweight() {
+  void flyweight() {
     final ConfigurationModel appleConfiguration = aggressiveGet(veganExtension.getConfigurationModel(APPLE));
     final ConfigurationModel bananaConfiguration = aggressiveGet(veganExtension.getConfigurationModel(BANANA));
 
@@ -156,12 +156,13 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void blockingExecutionTypes() {
+  void blockingExecutionTypes() {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
                                                              "blockingNonBlocking", "nonBlocking", "callGusFringNonBlocking",
                                                              "tapPhones", "sdkExecuteForeingOrders", "concurrentRouteExecutor",
-                                                             "simpleRouter", "spy", "stereotypedRoutes", "twoRoutesRouter",
+                                                             "simpleRouter", "spy", "stereotypedRoutes",
+                                                             "twoRoutesRouter", "manyRoutesRouter",
                                                              "sdkVoidRouter", "voidRouter");
 
     Reference<Boolean> cpuIntensive = new Reference<>(false);
@@ -192,7 +193,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void nonBlockingExecutionType() {
+  void nonBlockingExecutionType() {
     ExtensionModel extensionModel = loadExtension(MarvelExtension.class);
     OperationModel operation =
         extensionModel.getConfigurationModel(CONFIG_NAME).get().getOperationModel("fireMissile").get();
@@ -203,18 +204,18 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void contentParameter() {
+  void contentParameter() {
     assertSinglePrimaryContentParameter(veganExtension, "getAllApples", PAYLOAD);
   }
 
   @Test
-  public void contentParameterWithCustomDefault() {
+  void contentParameterWithCustomDefault() {
     assertSinglePrimaryContentParameter(veganExtension, "tryToEatThisListOfMaps",
                                         null);
   }
 
   @Test
-  public void exportedLibraries() {
+  void exportedLibraries() {
     assertExternalLibraries(heisenbergExtension);
     new IdempotentExtensionWalker() {
 
@@ -231,7 +232,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void streamingHintOnOperation() throws Exception {
+  void streamingHintOnOperation() throws Exception {
     OperationModel operationModel = heisenbergExtension.getConfigurationModels().get(0).getOperationModel("sayMyName").get();
     ParameterModel streamingParameter = operationModel.getAllParameterModels().stream()
         .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
@@ -242,7 +243,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void streamingHintOnSource() throws Exception {
+  void streamingHintOnSource() throws Exception {
     SourceModel sourceModel = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
     ParameterModel streamingParameter = sourceModel.getAllParameterModels().stream()
         .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
@@ -253,7 +254,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void untestableConnectionProvider() throws Exception {
+  void untestableConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(APPLE)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
@@ -262,7 +263,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void untestableSdkConnectionProvider() throws Exception {
+  void untestableSdkConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(KIWI)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
@@ -271,7 +272,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testableConnectionProvider() throws Exception {
+  void testableConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(BANANA)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
@@ -280,7 +281,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithReducedBackPressureStrategies() {
+  void sourceWithReducedBackPressureStrategies() {
     SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
 
     ParameterModel parameter = source.getAllParameterModels().stream()
@@ -297,7 +298,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithFixedBackPressureStrategy() {
+  void sourceWithFixedBackPressureStrategy() {
     SourceModel source = heisenbergExtension.getSourceModels().get(0);
 
     Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
@@ -308,7 +309,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithInheritedBackPressureStrategies() {
+  void sourceWithInheritedBackPressureStrategies() {
     SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
 
     BackPressureStrategyModelProperty backPressureStrategyModelProperty =
@@ -319,7 +320,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithInvalidDefaultBackPressureStrategies() {
+  void sourceWithInvalidDefaultBackPressureStrategies() {
     final var thrown =
         assertThrows(IllegalModelDefinitionException.class, () -> loadExtension(BadBackPressureHeisenbergExtension.class));
 
@@ -328,12 +329,12 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithInvalidBackPressureStrategies() {
+  void sourceWithInvalidBackPressureStrategies() {
     assertThrows(IllegalModelDefinitionException.class, () -> loadExtension(IllegalBackPressureHeisenbergExtension.class));
   }
 
   @Test
-  public void objectStoreParameters() {
+  void objectStoreParameters() {
     OperationModel operationModel = heisenbergExtension.getOperationModel("storeMoney").get();
     ParameterModel parameter =
         operationModel.getAllParameterModels().stream().filter(p -> "objectStore".equals(p.getName())).findFirst().get();
@@ -354,13 +355,13 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
-  public void defaultJavaVersionSupport() {
+  void defaultJavaVersionSupport() {
     assertThat(heisenbergExtension.getSupportedJavaVersions(), equalTo(Set.of(JAVA_21.version(), JAVA_17.version())));
   }
 
   @Test
   @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
-  public void customJavaVersionSupport() {
+  void customJavaVersionSupport() {
     ExtensionModel model = loadExtension(TestJavaSupportExtension.class);
     assertThat(model.getSupportedJavaVersions(), contains(JAVA_8.version(), JAVA_17.version()));
   }
@@ -368,7 +369,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Test
   @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
   @Issue("W-18586120")
-  public void customJavaVersionSupportWithJavaVersionMismatch() {
+  void customJavaVersionSupportWithJavaVersionMismatch() {
     ExtensionModel model = loadExtension(NewJavaVersionsExtension.class);
     assertThat(model.getSupportedJavaVersions(), contains(JAVA_17.version(), JAVA_21.version()));
   }

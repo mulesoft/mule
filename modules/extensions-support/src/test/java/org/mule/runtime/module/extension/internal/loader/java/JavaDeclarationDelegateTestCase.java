@@ -44,8 +44,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -53,9 +51,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -145,17 +146,15 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @SmallTest
+@ExtendWith(MockitoExtension.class)
 public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclarationTestCase {
-
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
 
   private static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
   private static final String EXTENDED_CONFIG_NAME = "extended-config";
@@ -209,13 +208,13 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   public static final MetadataType STRING_TYPE = TYPE_LOADER.load(String.class);
   public static final MetadataType INT_TYPE = toMetadataType(int.class);
 
-  @Before
+  @BeforeEach
   public void setUp() {
     setDeclarer(declarerFor(HeisenbergExtension.class));
   }
 
   @Test
-  public void describeTestModule() throws Exception {
+  void describeTestModule() throws Exception {
     ExtensionDeclarer declarer = declareExtension();
 
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
@@ -229,7 +228,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void heisenbergPointer() throws Exception {
+  void heisenbergPointer() throws Exception {
     setDeclarer(declarerFor(HeisenbergPointer.class));
     ExtensionDeclarer declarer = declareExtension();
 
@@ -244,7 +243,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void heisenbergPointerPlusExternalConfig() {
+  void heisenbergPointerPlusExternalConfig() {
     setDeclarer(declarerFor(HeisenbergPointerPlusExternalConfig.class));
     ExtensionDeclaration extensionDeclaration = declareExtension().getDeclaration();
 
@@ -259,39 +258,42 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
                     null);
   }
 
-  @Test(expected = IllegalConfigurationModelDefinitionException.class)
-  public void heisenbergWithOperationsConfig() {
-    declarerFor(HeisenbergWithSameOperationsAndConfigs.class);
-  }
-
-  @Test(expected = IllegalParameterModelDefinitionException.class)
-  public void heisenbergWithParameterGroupAsOptional() {
-    declarerFor(HeisenbergWithParameterGroupAsOptional.class);
-  }
-
-  @Test(expected = IllegalParameterModelDefinitionException.class)
-  public void heisenbergWithRecursiveParameterGroup() {
-    declarerFor(HeisenbergWithRecursiveParameterGroup.class);
-  }
-
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void heisenbergWithMoreThanOneConfigInOperation() {
-    declarerFor(HeisenbergWithInvalidOperation.class);
-  }
-
-  @Test(expected = IllegalOperationModelDefinitionException.class)
-  public void heisenbergWithOperationPointingToExtension() {
-    declarerFor(HeisenbergWithOperationsPointingToExtension.class);
-  }
-
-  @Test(expected = IllegalConfigurationModelDefinitionException.class)
-  public void heisenbergWithOperationPointingToExtensionAndDefaultConfig() {
-    declarerFor(HeisenbergWithOperationsPointingToExtensionAndDefaultConfig.class);
+  @Test
+  void heisenbergWithOperationsConfig() {
+    assertThrows(IllegalConfigurationModelDefinitionException.class,
+                 () -> declarerFor(HeisenbergWithSameOperationsAndConfigs.class));
   }
 
   @Test
-  public void messageOperationWithoutGenerics() {
+  void heisenbergWithParameterGroupAsOptional() {
+    assertThrows(IllegalParameterModelDefinitionException.class, () -> declarerFor(HeisenbergWithParameterGroupAsOptional.class));
+  }
+
+  @Test
+  void heisenbergWithRecursiveParameterGroup() {
+    assertThrows(IllegalParameterModelDefinitionException.class, () -> declarerFor(HeisenbergWithRecursiveParameterGroup.class));
+  }
+
+
+  @Test
+  void heisenbergWithMoreThanOneConfigInOperation() {
+    assertThrows(IllegalModelDefinitionException.class, () -> declarerFor(HeisenbergWithInvalidOperation.class));
+  }
+
+  @Test
+  void heisenbergWithOperationPointingToExtension() {
+    assertThrows(IllegalOperationModelDefinitionException.class,
+                 () -> declarerFor(HeisenbergWithOperationsPointingToExtension.class));
+  }
+
+  @Test
+  void heisenbergWithOperationPointingToExtensionAndDefaultConfig() {
+    assertThrows(IllegalConfigurationModelDefinitionException.class,
+                 () -> declarerFor(HeisenbergWithOperationsPointingToExtensionAndDefaultConfig.class));
+  }
+
+  @Test
+  void messageOperationWithoutGenerics() {
     ExtensionDeclarer declarer = declarerFor(HeisenbergWithGenericlessMessageOperation.class);
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "noGenerics");
 
@@ -300,7 +302,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void listOfResultsOperation() throws Exception {
+  void listOfResultsOperation() throws Exception {
     ExtensionDeclarer declarer = declarerFor(HeisenbergWithListOfResultOperations.class);
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "listOfResults");
 
@@ -311,13 +313,14 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
   }
 
-  @Test(expected = IllegalParameterModelDefinitionException.class)
-  public void invalidParameterGroupName() throws Exception {
-    declarerFor(HeisenbergWithParameterGroupDefaultName.class);
+  @Test
+  void invalidParameterGroupName() throws Exception {
+    assertThrows(IllegalParameterModelDefinitionException.class,
+                 () -> declarerFor(HeisenbergWithParameterGroupDefaultName.class));
   }
 
   @Test
-  public void listOfResultsOperationWithoutGenerics() throws Exception {
+  void listOfResultsOperationWithoutGenerics() throws Exception {
     ExtensionDeclarer declarer = declarerFor(HeisenbergWithListOfResultOperations.class);
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "listOfResultsWithoutGenerics");
 
@@ -327,7 +330,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void flyweight() {
+  void flyweight() {
     ExtensionDeclarer declarer = declarerFor(VeganExtension.class);
 
     final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -347,13 +350,13 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void minMuleVersionIsDescribedCorrectly() {
+  void minMuleVersionIsDescribedCorrectly() {
     ExtensionDeclarer declarer = declarerFor(HeisenbergExtension.class);
     declarer.getDeclaration();
   }
 
   @Test
-  public void categoryIsDescribedCorrectly() {
+  void categoryIsDescribedCorrectly() {
     setDeclarer(declarerFor(HeisenbergExtension.class));
     ExtensionDeclarer declarer = declareExtension();
     final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -361,13 +364,13 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void minMuleVersionDefaultValueIsDescribedCorrectly() {
+  void minMuleVersionDefaultValueIsDescribedCorrectly() {
     ExtensionDeclarer declarer = declarerFor(PetStoreConnector.class);
     declarer.getDeclaration();
   }
 
   @Test
-  public void categoryDefaultValueIsDescribedCorrectly() {
+  void categoryDefaultValueIsDescribedCorrectly() {
     setDeclarer(declarerFor(PetStoreConnector.class));
     ExtensionDeclarer declarer = declareExtension();
     final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -375,7 +378,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void flowListeningOperationWithoutAttributes() {
+  void flowListeningOperationWithoutAttributes() {
     setDeclarer(declarerFor(VeganExtension.class));
     ExtensionDeclarer declarer = declareExtension();
     final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -387,7 +390,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void disableIgnore() {
+  void disableIgnore() {
     DefaultExtensionLoadingContext loadingContext = createLoadingContext();
     loadingContext.addParameter(DISABLE_COMPONENT_IGNORE, true);
 
@@ -404,7 +407,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void disableSdkIgnore() {
+  void disableSdkIgnore() {
     DefaultExtensionLoadingContext loadingContext = createLoadingContext();
     loadingContext.addParameter(DISABLE_COMPONENT_IGNORE, true);
     ExtensionDeclarer declarer = declarerFor(HeisenbergExtension.class, loadingContext);
@@ -418,7 +421,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void defaultClusterSupport() {
+  void defaultClusterSupport() {
     SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPayments");
 
     SourceClusterSupportModelProperty sourceClusterSupportModelProperty =
@@ -428,7 +431,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void clusterSupportDefaultingPrimaryNodeOnly() {
+  void clusterSupportDefaultingPrimaryNodeOnly() {
     SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("listen-payments-cluster");
 
     SourceClusterSupportModelProperty sourceClusterSupportModelProperty =
@@ -438,7 +441,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void backPressureSupport() {
+  void backPressureSupport() {
     SourceDeclaration sourceDeclaration = getSourceDeclarationWithName("ListenPaymentsAllOptional");
     BackPressureStrategyModelProperty backPressureStrategyModelProperty =
         sourceDeclaration.getModelProperty(BackPressureStrategyModelProperty.class).get();
@@ -448,7 +451,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void handlingOfMetadataKeyIdWithoutOutputAndInputResolvers() {
+  void handlingOfMetadataKeyIdWithoutOutputAndInputResolvers() {
     ExtensionDeclarer declarer = declarerFor(ExtensionWithMetadataKeyIdWithoutOutputAndInputResolvers.class);
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "withParameterWithMetadataKeyId");
     java.util.Optional<MetadataKeyIdModelProperty> metadataKeyIdModelProperty =
@@ -564,7 +567,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(74));
+    assertThat(extensionDeclaration.getOperations(), hasSize(75));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(26));
@@ -614,6 +617,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, "simpleRouter", "");
     assertOperation(extensionDeclaration, "stereotypedRoutes", "");
     assertOperation(extensionDeclaration, "twoRoutesRouter", "");
+    assertOperation(extensionDeclaration, "manyRoutesRouter", "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));

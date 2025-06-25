@@ -31,6 +31,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsMultiple;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.acceptsReferences;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.getChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
@@ -87,6 +88,7 @@ import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.config.dsl.construct.ListOfRoutesComponentParser;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.RouteComponentParser;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.FixedTypeParsingDelegate;
@@ -175,8 +177,7 @@ public abstract class ExtensionDefinitionParser {
    * @throws ConfigurationException if a parsing error occurs
    */
   public final List<ComponentBuildingDefinition> parse() throws ConfigurationException {
-    Builder builder = definitionBuilder;
-    builder = doParse(builder);
+    Builder builder = doParse(definitionBuilder);
 
     AttributeDefinition parametersDefinition = fromFixedValue(new HashMap<>()).build();
     if (!parameters.isEmpty()) {
@@ -877,10 +878,26 @@ public abstract class ExtensionDefinitionParser {
     addParameter(getChildKey(routeModel.getName()),
                  new DefaultObjectParsingDelegate().parse(routeModel.getName(), (ObjectType) metadataType, routeDsl));
 
+    final var tccl = getContextClassLoader();
+    final var parserTypeLoader = of(typeLoader);
     try {
-      new RouteComponentParser(definitionBuilder, routeModel, metadataType, getContextClassLoader(), routeDsl,
-                               dslResolver, parsingContext, of(typeLoader)).parse()
-                                   .forEach(this::addDefinition);
+      if (supportsMultiple(routeModel)) {
+        new ListOfRoutesComponentParser(definitionBuilder, routeModel, metadataType, tccl, routeDsl,
+                                        dslResolver, parsingContext, parserTypeLoader)
+                                            .parse()
+                                            .forEach(this::addDefinition);
+
+        DslElementSyntax routesDsl = routeDsl.getChilds().get(0);
+        new RouteComponentParser(definitionBuilder, routeModel, metadataType, tccl, routesDsl,
+                                 dslResolver, parsingContext, parserTypeLoader)
+                                     .parse()
+                                     .forEach(this::addDefinition);
+      } else {
+        new RouteComponentParser(definitionBuilder, routeModel, metadataType, tccl, routeDsl,
+                                 dslResolver, parsingContext, parserTypeLoader)
+                                     .parse()
+                                     .forEach(this::addDefinition);
+      }
     } catch (Exception e) {
       throw new MuleRuntimeException(new ConfigurationException(e));
     }
