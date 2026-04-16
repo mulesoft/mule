@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "source": "MuleSoft Product Versioning and Back Support Policy",
+    "source_url": "https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/Agreements/versioning-back-support-policy.pdf",
+    "java_adoption_url": "https://docs.mulesoft.com/release-notes/mule-runtime/java-adoption",
+    "extracted_date": "2026-04-16"
+  },
+  "versions": {
+    "4.11": {
+      "type": "Edge",
+      "release_date": "2026-02-04",
+      "end_of_standard_support": "2026-07-04",
+      "end_of_extended_support": "2026-10-04",
+      "end_of_life": "2027-10-04",
+      "supported_java_versions": ["17"]
+    },
+    "4.10": {
+      "type": "Edge",
+      "release_date": "2025-10-02",
+      "end_of_standard_support": "2026-03-03",
+      "end_of_extended_support": "2026-06-03",
+      "end_of_life": "2027-06-03",
+      "supported_java_versions": ["17"]
+    },
+    "4.9": {
+      "type": "LTS",
+      "release_date": "2025-02-06",
+      "end_of_standard_support": "2027-08-06",
+      "end_of_extended_support": "2028-02-06",
+      "end_of_life": "2029-02-06",
+      "supported_java_versions": ["17"]
+    },
+    "4.8": {
+      "type": "Edge",
+      "release_date": "2024-10-08",
+      "end_of_standard_support": "2025-03-08",
+      "end_of_extended_support": "2025-06-08",
+      "end_of_life": "2026-06-08",
+      "supported_java_versions": ["8", "11", "17"]
+    },
+    "4.7": {
+      "type": "Edge",
+      "release_date": "2024-06-04",
+      "end_of_standard_support": "2024-10-04",
+      "end_of_extended_support": "2025-02-04",
+      "end_of_life": "2026-02-04",
+      "supported_java_versions": ["8", "11", "17"]
+    },
+    "4.6": {
+      "type": "LTS",
+      "release_date": "2024-02-06",
+      "end_of_standard_support": "2026-08-06",
+      "end_of_extended_support": "2027-02-06",
+      "end_of_life": "2028-02-06",
+      "supported_java_versions": ["8", "11", "17"]
+    },
+    "4.5": {
+      "type": "Edge",
+      "release_date": "2023-10-03",
+      "end_of_standard_support": "2024-02-06",
+      "end_of_extended_support": "2024-06-04",
+      "end_of_life": "2025-06-04",
+      "supported_java_versions": ["8", "11"]
+    },
+    "4.4": {
+      "type": "Minor",
+      "release_date": "2021-09-07",
+      "end_of_standard_support": "2024-10-08",
+      "end_of_extended_support": "2025-10-08",
+      "end_of_life": "2026-10-08",
+      "supported_java_versions": ["8", "11"]
+    },
+    "4.3": {
+      "type": "Minor",
+      "release_date": "2020-04-30",
+      "end_of_standard_support": "2023-03-07",
+      "end_of_extended_support": "2025-03-07",
+      "end_of_life": "2026-03-07",
+      "supported_java_versions": ["8", "11"]
+    },
+    "4.2": {
+      "type": "Minor",
+      "release_date": "2019-05-02",
+      "end_of_standard_support": "2021-05-02",
+      "end_of_extended_support": "2023-05-02",
+      "end_of_life": "2024-05-02",
+      "supported_java_versions": ["8"]
+    },
+    "4.1": {
+      "type": "Minor",
+      "release_date": "2018-03-20",
+      "end_of_standard_support": "2020-11-02",
+      "end_of_extended_support": "2022-11-02",
+      "end_of_life": "2023-11-02",
+      "supported_java_versions": ["8"]
+    },
+    "3.9": {
+      "type": "LTS",
+      "release_date": "2017-10-09",
+      "end_of_standard_support": "2021-03-20",
+      "end_of_extended_support": "2024-03-20",
+      "end_of_life": "2025-03-20",
+      "supported_java_versions": ["8"]
+    },
+    "3.8": {
+      "type": "LTS",
+      "release_date": "2016-05-16",
+      "end_of_standard_support": "2018-11-16",
+      "end_of_extended_support": "2021-11-16",
+      "end_of_life": "2022-11-16",
+      "supported_java_versions": ["8"]
+    }
+  }
+}
