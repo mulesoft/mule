@@ -12,7 +12,7 @@
       "end_of_standard_support": "2026-11-02",
       "end_of_extended_support": "2027-02-02",
       "end_of_life": "2028-02-02",
-      "supported_java_versions": ["17"]
+      "supported_java_versions": ["17", "21", "25"]
     },
     "4.11": {
       "type": "Edge",
