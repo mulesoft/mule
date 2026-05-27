@@ -188,13 +188,21 @@ public class OpenTelemetryTraceIdUtils {
     chars[TRACE_OPTION_OFFSET] = '0';
     chars[TRACE_OPTION_OFFSET + 1] = '1';
     context.put(TRACE_PARENT, new String(chars, 0, TRACEPARENT_HEADER_SIZE));
+
+    String encodedTraceState;
     if (isAddMuleAncestorSpanId) {
-      context.put(TRACE_STATE_KEY,
-                  encodeTraceState(openTelemetrySpanExporter.getTraceState()
-                      .withAncestor(openTelemetrySpanExporter.getSpanId())));
+      encodedTraceState = encodeTraceState(openTelemetrySpanExporter.getTraceState()
+          .withAncestor(openTelemetrySpanExporter.getSpanId()));
     } else {
-      context.put(TRACE_STATE_KEY,
-                  encodeTraceState(openTelemetrySpanExporter.getTraceState()));
+      encodedTraceState = encodeTraceState(openTelemetrySpanExporter.getTraceState());
+    }
+
+    // W3C trace-context (https://www.w3.org/TR/trace-context/#tracestate-header) requires
+    // tracestate to contain at least one list-member. Emitting an empty value produces
+    // "tracestate: " on outbound HTTP headers, which some intermediaries and downstream
+    // services reject. Only propagate the header when there is actually a value to send.
+    if (encodedTraceState != null && !encodedTraceState.isEmpty()) {
+      context.put(TRACE_STATE_KEY, encodedTraceState);
     }
 
     return context;
